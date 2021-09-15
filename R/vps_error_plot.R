@@ -1,0 +1,26 @@
+vps_error_plot <- function(data, which){
+  if (which == "all"){
+    data <- data %>%
+      filter(Time > min(crab.data$time) & Time < max(crab.data$time))
+  } else if (which == "ref"){
+    data <- data %>%
+      filter(Time > min(crab.data$time) & Time < max(crab.data$time)) %>%
+      filter(FullId == "A69-1602-65344")
+  }
+  data %>%
+    mutate(date = date(Time)) %>%
+    ggplot(data = .,
+           aes(x = date,
+               y = HPEm,
+               group = date)) +
+    geom_boxplot() +
+    coord_cartesian(ylim = c(0, 7)) +
+    scale_x_date(breaks = "month",
+                 date_labels = "%e %b") +
+    theme_bw() +
+    theme(axis.text = element_text(colour = "black", size = 12),
+          axis.title = element_text(colour = "black", size = 12),
+          panel.grid = element_blank()) +
+    ylab("Horizontal position error (m)") +
+    xlab("Date")
+}
