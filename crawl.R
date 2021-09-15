@@ -5,12 +5,10 @@ library(rgdal)
 library(ggplot2)
 library(lubridate)
 library(parallel)
-#library(lunar)
 library(sf)
 library(sfheaders)
 library(lwgeom)
 library(spatialEco)
-#library(ggmap)
 
 if (Sys.info()[6] != "Dan"){
   setwd("/srv/scratch/z5278054/VPS")
@@ -28,12 +26,6 @@ source("R/vps_error_plot.R") # function to plot daily error boxplots of the VPS
 source("R/n_prop.R") # function for checking interpolation choices based on Lawler et al. (2019)
 source("R/n_adj.R") # function for checking interpolation choices based on Lawler et al. (2019)
 source("R/check_convergence.R") # check which tracks converged from crawlWrap()
-source("R/find_interval.R") # function to assign detections to the interpolated interval for downstream summarising of accel - takes a couple of minutes to run
-source("R/save_object.R") # wrapper for savRDS()
-source("R/find_habitat.R") # intersects crab location with habitat layers
-source("R/tide_height.R") # gets the tide height at the time of each detection
-source("R/find_wq.R") # gets temp. and cond. at the time of each detection
-source("R/salinity_converter.R") # converts conductivity to salinity
 source("R/location_error.R") # gets the estimated of location error (in x and y) to feed into crawlWrap()
 
 # load in the data
@@ -92,6 +84,7 @@ vps.error <- syncref.data %>% vps_error(type = "both", which = "ref")
 
 # matt is interested in the error data up to the third quantile (most accurate 75 % of data)
 #error.upperq <- vps.error %>% filter(HPEm < quantile(vps.error$HPEm)[4])
+############
 
 # Convert time to POSIXct
 crab.data <- crab.data %>% mutate(time = as.POSIXct(time, tz = "UTC"))
@@ -145,7 +138,10 @@ save_object(crwOut, "crabctcrw.rds")
 # prepare the data for a HMM
 prepData <- prepData(crwOut)
 
-## first check
+# check the metrics described in Lawler et al., 2019
+# proportional sample size (n_prop) and adjusted proportional sample size (n_adj)
+# both should be ~1 to avoid over-smoothing (<1) or data replication (>1)
+
 # n_prop tries to preserve number of locations in the track
 print(n_prop(input_data = crab.data, interpolated_data = prepData))
 
