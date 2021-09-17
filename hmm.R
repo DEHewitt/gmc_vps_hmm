@@ -13,7 +13,7 @@ source("R/save_object.R")
 index <- as.integer(Sys.getenv('PBS_ARRAY_INDEX'))
 
 # read in the data
-prepData <- readRDS("crab_prep.rds")
+prepData <- readRDS("crab_prep_env.rds")
 
 # number of random perturbations of initial parameters
 retryFits <- 25
