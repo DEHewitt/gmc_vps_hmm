@@ -11,8 +11,11 @@ library(patchwork)
 # number of states and the second
 # is the number of data-streams
 
+# load functions
+source("R/weibull_params.R")
+
 # load the data
-prepData <- readRDS("data_processed/crab_prep_env.rds")
+prepData <- readRDS("data_processed/15 mins_crab_prep_env.rds")
 crab.data <- readRDS("data_processed/crab_data.rds")
 
 # summary of tracks
@@ -95,25 +98,29 @@ ggplot() + # and then this plot has no error representation as in this modelling
 ggsave()
 
 # load the models
-m22 <- readRDS("data_processed/crab_hmm_2state_2streams.rds")
-m23 <- readRDS("data_processed/crab_hmm_2state_3streams.rds")
-m32 <- readRDS("data_processed/crab_hmm_3state_2streams.rds")
-m33 <- readRDS("data_processed/crab_hmm_3state_3streams.rds")
+m23 <- readRDS("data_processed/5 mins_crab_hmm_2state_3streams.rds")
+m33 <- readRDS("data_processed/5 mins_crab_hmm_3state_3streams.rds")
 
 # check model assumptions
-plotPR(m22)
 plotPR(m23)
-plotPR(m32)
 plotPR(m33)
 
 # check out the model
-m22
 m23
-m32
 m33
 
 # look at some plots
-plot(m22)
 plot(m23)
-plot(m32)
 plot(m33)
+
+weibull_params(m = m33)
+
+# check how bad pseudores look without zeroes
+non.zero <- which(prepData$step > 0)
+step.pseudo <- pseudoRes(m33)$stepRes
+step.pseudo.non.zero <- step.pseudo[c(non.zero)]
+qqnorm(step.pseudo.non.zero)
+qqline(step.pseudo.non.zero)
+
+qqnorm(step.pseudo)
+qqline(step.pseudo)

@@ -4,7 +4,7 @@ save_object <- function(object, file){
   
   # allocate the file to the right directory
   if (Sys.info()[6] == "Dan"){
-    file <- paste(getwd(), "data_processed", file, sep = "/")
+    file <- paste(getwd(), file, sep = "/")
   } else {
     file <- paste(getwd(), file, sep = "/")
     

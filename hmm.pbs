@@ -3,7 +3,7 @@
 #PBS -l select=1:ncpus=1:mem=124gb
 #PBS -l walltime=11:59:00
 #PBS -j oe
-#PBS -J 1-4
+#PBS -J 1-6
 #PBS -M daniel.hewitt@unsw.edu.au
 #PBS -m ae
 

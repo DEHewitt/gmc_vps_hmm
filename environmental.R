@@ -11,12 +11,8 @@ library(sfheaders)
 library(lwgeom)
 library(spatialEco)
 
-# load data
-crab.data <- readRDS("data_processed/crab_data.rds")
-crwOut <- readRDS("data_processed/crabctcrw.rds")
-prepData <- readRDS("data_processed/crab_prep.rds")
-
 # load functions
+source("R/load_crawl.R") # loads output from crawl
 source("R/load_data.R")
 source("R/find_interval.R") # function to assign detections to the interpolated interval for downstream summarising of accel - takes a couple of minutes to run
 source("R/save_object.R") # wrapper for savRDS()
@@ -24,6 +20,9 @@ source("R/find_habitat.R") # intersects crab location with habitat layers
 source("R/tide_height.R") # gets the tide height at the time of each detection
 source("R/find_wq.R") # gets temp. and cond. at the time of each detection
 source("R/salinity_converter.R") # converts conductivity to salinity
+
+# load crawl output
+load_crawl() # need to edit this to open the right objects
 
 # get auxilliary data (e.g., habitat, wq)
 load_data()
@@ -50,7 +49,7 @@ prepData <- prepData %>% salinity_converter()
 prepData <- prepData %>% mutate(lunar = lunar.phase(time, shift = 10))
 
 # find the intervals
-intervals <- find_interval(irregular.times = crab.data, interpolated.times = prepData, time.step = 240) # this takes a decent bit of time
+intervals <- find_interval(irregular.times = crab.data, interpolated.times = prepData, time.step = 900) # this takes a decent bit of time
 
 # summarise the accel data
 intervals <- intervals %>% group_by(ID, time) %>% summarise(mean.accel = mean(accel), sd.accel = sd(accel), n = n()) %>% ungroup() %>% as.data.frame()
@@ -67,7 +66,10 @@ prepData <- prepData %>% left_join(bio.data)
 # ensure prepData is a momentuHMM object
 class(prepData) <- append("momentuHMMData", class(prepData))
 
-ggplot() + geom_path(data = prepData, aes(x = x, y = y, group = ID, colour = mean.accel), size = 1) + facet_wrap(vars(sex, crab)) + scale_color_viridis_c()
+#ggplot() + geom_path(data = prepData, aes(x = x, y = y, colour = ID, group = ID), size = 1) + 
+ # facet_wrap(vars(sex, crab), scales = "free") + 
+  #scale_color_viridis_d() +
+  #theme(legend.position = "none")
 
 # previous step covariate
 #prepData <- prepData %>%
@@ -79,5 +81,7 @@ ggplot() + geom_path(data = prepData, aes(x = x, y = y, group = ID, colour = mea
 # remove first location in each track so that every prev.step row has a value
 #prepData <- prepData %>% filter(!is.na(prev.step))
 
+name <- paste0("data_processed/crab_prep_env.rds")
+
 # save the output
-save_object(prepData, "crab_prep_env.rds")
+save_object(prepData, name)

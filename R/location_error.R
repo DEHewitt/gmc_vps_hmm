@@ -17,7 +17,7 @@ location_error <- function(data, station.data, vps.error){
     rename(x_receiver = Long, y_receiver = Lat)
   
   error <- vps.error %>%
-    select(FullId, Time, Longitude, Latitude)
+    dplyr::select(FullId, Time, Longitude, Latitude)
   
   coordinates(error) <- c("Longitude", "Latitude") # assign coordinates
   proj4string(error) <- CRS("+proj=longlat") # assign CRS

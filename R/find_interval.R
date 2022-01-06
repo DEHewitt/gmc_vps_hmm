@@ -25,7 +25,7 @@ find_interval <- function(irregular.times, interpolated.times, time.step){
       dplyr::select(ID, time) %>%
       group_by(ID) %>%
       arrange(time) %>%
-      mutate(interval = if_else(time == min(time), interval(time-time.step, time), interval(lag(time), time))) %>%
+      mutate(interval = if_else(time == min(time), interval(time-time.step, time), interval(lag(time)+1, time))) %>%
       ungroup() %>% 
       select(ID, interval) %>%
       filter(ID == IDs[i])
