@@ -1,0 +1,23 @@
+#!/bin/bash
+ 
+#PBS -l select=1:ncpus=1:mem=123gb
+#PBS -l walltime=47:59:00
+#PBS -j oe
+#PBS -J 1-24
+#PBS -M daniel.hewitt@unsw.edu.au
+#PBS -m ae
+
+module purge
+
+module add perl/5.28.0
+module add python/2.7.15
+module add sqlite/3.31.1
+module add spatialite/5.0.0b0
+module add gdal/2.3.2
+module add proj4/5.1.0
+module add geos/3.8.1
+module add gcc/7.5.0
+module add R/4.0.2-gcc7
+module add protobuf/3.14.0-gcc7
+
+Rscript mixed-hmm.R

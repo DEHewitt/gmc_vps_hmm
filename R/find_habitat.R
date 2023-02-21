@@ -1,4 +1,4 @@
-find_habitat <- function(data, habitat.layer){
+find_habitat <- function(data, habitat){
   
   # housekeeping with the spatial points
   utmcoord.1 <- SpatialPoints(as.data.frame(data %>% dplyr::select(x, y)),
@@ -17,8 +17,8 @@ find_habitat <- function(data, habitat.layer){
   points <- st_as_sf(as.data.frame(data %>% dplyr::select(lon, lat, row.id)), 
                      coords = c("lon", "lat"), crs = "+proj=longlat +datum=WGS84")
   
-  habitat.layer <- habitat.layer %>% st_transform(crs = "+proj=longlat + datum=WGS84")
-  points <- point.in.poly(points, habitat.layer)
+  habitat <- habitat %>% st_transform(crs = "+proj=longlat + datum=WGS84")
+  points <- point.in.poly(points, habitat)
   
   points <- as.data.frame(points[, 1:2]) %>%
     rename(habitat = HABITAT) %>%
@@ -26,9 +26,9 @@ find_habitat <- function(data, habitat.layer){
   
   data <- data %>%
     left_join(points, by = "row.id") %>%
-    select(-row.id, -coords.x1, -coords.x2)
+    dplyr::select(-row.id, -coords.x1, -coords.x2)
   
-  data <- data %>% mutate(habitat = factor(habitat))
+  #data <- data %>% mutate(habitat = factor(habitat))
 }
 
 

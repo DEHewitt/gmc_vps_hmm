@@ -12,7 +12,7 @@ find_interval <- function(irregular.times, interpolated.times, time.step){
   # an empty df for results of each iteration
   output.1 <- data.frame()
   
-  # loop through each crab
+  # loop through each track
   for(i in 1:length(IDs)){
     
     # just give me the ID, times and any additional info I want to know about
@@ -27,7 +27,7 @@ find_interval <- function(irregular.times, interpolated.times, time.step){
       arrange(time) %>%
       mutate(interval = if_else(time == min(time), interval(time-time.step, time), interval(lag(time)+1, time))) %>%
       ungroup() %>% 
-      select(ID, interval) %>%
+      dplyr::select(ID, interval) %>%
       filter(ID == IDs[i])
     
     # get every unique time - we need to run this process for every time point
@@ -58,7 +58,7 @@ find_interval <- function(irregular.times, interpolated.times, time.step){
       #max.int <- str_sub(intervals$interval[end], 26, 44)
       
       # get rid of the last point which will always be outside an interval
-      output.2 <- output.2 %>% filter(!is.na(interval))
+      #output.2 <- output.2 %>% filter(!is.na(interval))
     }
     output.1 <- bind_rows(output.1, output.2)
   }

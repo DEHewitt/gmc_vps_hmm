@@ -1,18 +1,19 @@
-vps_error <- function(data, type, which){
+vps_error <- function(data, type, which, time){
   # in this function type refers to the type of 
   # summary statistic we want: mean (+/- sd) or 
   # median or both
   # which refers to which tags with know locations 
   # that we want to use and can be either "all" 
-  # which includes sync tags and ref tags or "ref"
-  # which only includes ref tags
-  if (which == "all"){
+  # which includes sync tags and ref tags or "ref" which only includes ref tags
+  # time is the df that has the time limits (i.e. beginning and end of study)
+  if (which == "both"){
     data <- data %>%
-      filter(Time > min(crab.data$time) & Time < max(crab.data$time))
-  } else if (which == "ref"){
-    data <- data %>%
-      filter(Time > min(crab.data$time) & Time < max(crab.data$time)) %>%
+      filter(Time > min(time$time) & Time < max(time$time)) %>%
       filter(FullId == "A69-1602-65344" | FullId == "A69-1602-65345")
+  } else if (which == "longest"){
+    data <- data %>%
+      filter(Time > min(time$time) & Time < max(time$time)) %>%
+      filter(FullId == "A69-1602-65344")
   }
   
   if (type == "mean"){

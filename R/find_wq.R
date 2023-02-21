@@ -3,7 +3,7 @@ find_wq <- function(data, wq.data){
   wq.data <- wq.data %>%
     rename(time = date_time, temp = temp_degC, cond = calibrated_conductivity_ms_cm) %>%
     mutate(time.join = round_date(dmy_hms(time), "hour")) %>%
-    select(-latitude, -longitude) %>%
+    dplyr::select(-latitude, -longitude) %>%
     filter(time.join > min(data$time)-3600) %>%
     filter(time.join < max(data$time)+3600) %>%
     dplyr::select(cond, temp, time.join)

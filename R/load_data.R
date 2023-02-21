@@ -7,7 +7,8 @@ load_data <- function(){
                  bio.data = read_csv("data_raw/gmc_vps_biodata.csv"),
                  wq.data = read_csv("data_raw/gmc_vps_cond_salinity_201019.csv"),
                  habitat = st_as_sf(readOGR("data_raw/taylors_beach_habitat.shp"), crs = "proj=longlat +datum=GDA94"),
-                 tide.data = read_csv("data_raw/MallabulaPoint.Level1.csv", skip = 30))
+                 tide.data = read_csv("data_raw/MallabulaPoint.Level1.csv", skip = 30),
+                 oyster.leases = st_as_sf(readOGR("data_raw/Aquaculture_Leases.shp")))
   } else {
     data <- list(raw.data = read_csv("data/animal/all.csv"),
                  syncref.data = read_csv("data/syncref/all.csv"),
