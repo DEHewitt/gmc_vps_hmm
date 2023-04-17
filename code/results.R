@@ -25,8 +25,7 @@ syncref.data <- read_csv("data_raw/Daniel Hewitt/VPS-TaylorsBeach-MudCrab-01-Res
 oyster.leases <- st_as_sf(readOGR("data_raw/Aquaculture_Leases.shp"))
 
 #---------- for plotting ----------#
-nsw_coast <- nsw_coast %>% 
-  mutate(water = if_else(code_coast == 1000, "Soft sediment", "Land"))
+nsw_coast <- nsw_coast %>% mutate(water = if_else(code_coast == 1000, "Soft sediment", "Land"))
 #----------------------------------#
 
 #---------- custom functions ----------#
@@ -177,8 +176,8 @@ state_dist <- plot_state_distributions(m = m2_15, prepData = prepData, outliers 
 # save the plot
 ggsave(filename = "figures/crab-hmm-2-state-15-min-distributions.png",
        device = "png",  
-       width = 20, 
-       height = 20, 
+       width = 27, 
+       height = 9, 
        units = "cm", 
        dpi = 600)
 #-----------------------------------------#
@@ -251,6 +250,7 @@ for(i in 1:length(IDs)){
               alpha = 0.75) +
     theme(axis.text = element_blank(),
           axis.title = element_blank(),
+          axis.ticks = element_blank(),
           legend.position = "bottom") +
     scale_colour_viridis_d(direction = -1) +
     guides(colour = "none", fill = guide_legend(nrow = 3, byrow = TRUE)) +
@@ -258,6 +258,7 @@ for(i in 1:length(IDs)){
                       values = c("light grey", "seagreen", "tan2", "seagreen1", "light yellow")) +
     #coord_sf(xlim = c(xlim2[1], xlim2[2]+0.0009), ylim = ylim2) +
     coord_sf(xlim = xlim1, ylim = ylim1) +
+    annotation_scale() +
     labs(fill = "Habitat")# +
     #annotation_custom(grob = ggplotGrob(inset), xmin = xlim2[2]+0.0002, xmax = xlim2[2]+0.0011, ymax = ylim2[1]+0.0009, ymin = ylim2[1])
   
@@ -268,7 +269,7 @@ for(i in 1:length(IDs)){
                    y = factor(state),
                colour = as.factor(state))) +
     theme(axis.title.x = element_blank(),
-          axis.text.x = element_blank(),
+          axis.text.x = element_text(hjust = 1),
           legend.position = "none") +
     ylab("Estimated state") +
   scale_colour_viridis_d(direction = -1)
@@ -279,7 +280,7 @@ for(i in 1:length(IDs)){
               aes(x = time,
                   y = `pr(1)`)) +
     theme(axis.title.x = element_blank(),
-          axis.text.x = element_blank()) +
+          axis.text.x = element_text(hjust = 1)) +
     ylab("Pr(State 1)") +
     scale_y_continuous(limits = c(0, 1))
   
@@ -290,6 +291,7 @@ for(i in 1:length(IDs)){
                   y = `pr(2)`)) +
     ylab("Pr(State 2)") +
     xlab("Time") +
+    theme(axis.text.x = element_text(hjust = 1)) +
     scale_y_continuous(limits = c(0, 1))
   
   x <- (a|(b/c/d)) + plot_annotation(tag_levels = "a")
@@ -698,7 +700,9 @@ interp.summary <- prepData %>%
   group_by(crab, sex, cl_mm, release_date) %>%
   summarise(n.interp = n(),
             missing.accel = length(which(is.na(mean.accel))),
-            distance.km = sum(step, na.rm = TRUE)/1000) %>%
+            distance.km = sum(step, na.rm = TRUE)/1000,
+            min_temp = min(temp),
+            max_temp = max(temp)) %>%
   ungroup()
 
 # summarise the tracks

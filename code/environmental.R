@@ -60,12 +60,6 @@ for (i in 1:length(timeStep)){
   # get the nearest (in time) temperature and conductivity
   prepData <- prepData %>% find_wq(wq.data)
   
-  # convert conductivity to salinity
-  prepData <- prepData %>% salinity_converter()
-  
-  # get the lunar data
-  #prepData <- prepData %>% mutate(lunar = lunar.phase(time, shift = 10))
-  
   # set time.step argument so you're calculating the right intervals
   time.step <- timeStep %>% str_sub(1, 2) %>% as.numeric()*60
   
@@ -87,13 +81,6 @@ for (i in 1:length(timeStep)){
   # get the individual id of each crab
   prepData <- prepData %>% mutate(crab = str_sub(ID, 1, 13))
   
-  # impute missing acceleration data
-  #prepData <- prepData %>%
-   # group_by(ID) %>%
-    #mutate(mean.accel = na_kalman(mean.accel, model = "auto.arima")) %>%
-    #ungroup() %>%
-    #mutate(mean.accel = if_else(mean.accel < 0, 0, mean.accel))
-  
   # get the sex of each crab
   prepData <- prepData %>% left_join(bio.data)
   
@@ -112,11 +99,21 @@ for (i in 1:length(timeStep)){
   
   a <- prepData %>% 
     filter(crab %in% unique(releases$crab)) %>%
+    group_by(ID) %>%
+    arrange(time) %>%
+    mutate(index = row_number()) %>%
+    mutate(track = cur_group_id()) %>%
+    ungroup() %>%
+    group_by(crab) %>%
+    mutate(track1 = if_else(track == min(track), "first", "not first")) %>% 
+    ungroup() %>%
+    mutate(track = factor(track, levels = unique(track))) %>%
+    mutate(track = factor(track, levels = rev(levels(track)))) %>%
   ggplot(data = .,
-         aes(x = time,
+         aes(x = index,
              y = mean.accel)) +
-    geom_path(aes(colour = ID)) +
-    facet_wrap(vars(crab), scales = "free") +
+    geom_path(aes(colour = track1, group = track)) +
+    facet_wrap(vars(crab), scales = "free_x") +
     theme_bw() +
     theme(panel.grid = element_blank(),
           axis.title = element_text(size = 12, colour = "black"),
@@ -124,9 +121,10 @@ for (i in 1:length(timeStep)){
           strip.background = element_blank(),
           strip.text = element_text(size = 12, colour = "black"),
           legend.position = "none") +
-    xlab("Date") +
-    ylab(expression(paste("Acceleration (m s"^-2, ")"))) +
-    scale_x_datetime(date_breaks = "1 month", date_labels = "%b")
+    xlab("Observation index") +
+    scale_colour_manual(values = c("black", "light grey")) +
+    ylab(expression(paste("Acceleration (m s"^-2, ")")))# +
+    #scale_x_datetime(date_breaks = "1 month", date_labels = "%b")
   
   ggsave(paste0("figures/", timeStep[i], "-first-day-activity.png"),
          plot = a,
@@ -142,36 +140,6 @@ for (i in 1:length(timeStep)){
   
   write_csv(x = seasonal,
             file = paste0("output/", timeStep[i], "-seasonal-tracks.csv"))
-  
-  #prepData <- prepData %>%
-   # filter(!(month(time) %in% c(6, 7, 8)))
-  
-  # add previous step length as a covariate
-  prepData <- prepData %>% 
-    group_by(ID) %>% 
-    arrange(time, .by_group = TRUE) %>% 
-    mutate(prev.step = lag(step, n = 1)) %>% 
-    ungroup()
-  
-  # set prev.step at t = 1 to be the same
-  prepData <- prepData %>% 
-    mutate(prev.step = case_when(is.na(prev.step) ~ step,
-                                 !is.na(prev.step) ~ prev.step))
-  
-  # add previous accel as a covariate
-  prepData <- prepData %>% 
-    group_by(ID) %>% 
-    arrange(time, .by_group = TRUE) %>% 
-    mutate(prev.accel = lag(mean.accel, n = 1)) %>% 
-    ungroup()
-  
-  # set prev.accel at time t = 1 to be the same as mean.accel
-  prepData <- prepData %>% 
-    group_by(ID) %>% 
-    arrange(time, .by_group = TRUE) %>% 
-    mutate(prev.accel = case_when(is.na(prev.accel) ~ mean.accel,
-                                  !is.na(prev.accel) ~ prev.accel)) %>% 
-    ungroup()
   
   # ensure prepData is a momentuHMM object
   class(prepData) <- append("momentuHMMData", class(prepData))

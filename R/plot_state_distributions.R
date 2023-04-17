@@ -228,8 +228,9 @@ plot_state_distributions <- function(m, prepData, outliers){
           legend.position = c(0.75, 0.9),
           legend.background = element_blank(),
           axis.title = element_text(size = 12, colour = "black"),
-          axis.text = element_text(size = 12, colour = "black")) +
-    ylab("Density") +
+          axis.text = element_text(size = 12, colour = "black"),
+          axis.title.y = element_blank()) +
+    #ylab("Density") +
     xlab(expression(paste("Acceleration (m s"^-2, ")")))
   
   ###############
@@ -330,7 +331,7 @@ plot_state_distributions <- function(m, prepData, outliers){
                                   expression(paste(pi, "/2")),
                                   expression(paste(pi))))
   
-  plot <- a + c + b + plot_spacer() + plot_annotation(tag_levels = "a") + plot_layout(nrow = 2)
+  plot <- (a | c | b) + plot_annotation(tag_levels = "a") #+ plot_layout(nrow = 2)
   print(plot)
   return(plot)
 }

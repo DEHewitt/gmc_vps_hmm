@@ -1,6 +1,6 @@
 # gmc_vps_hmm
 
-This repository contains all code to process and analyse data as presented in Hewitt et al., (2023). Data for this project is _include info about copyright_. This data is hosted on the [Integrated Marine Observing System Animal Tracking Facility (IMOS ATF) database](https://imos.org.au/facilities/animaltracking) under the NSW Department of Primary Industries Coastal and Estuarine Fish Tracking (CEFT) project. However, this data is under embargo until _date_.
+This repository contains all code to process and analyse data as presented in [Hewitt et al., (2023)](https://movementecologyjournal.biomedcentral.com/articles/10.1186/s40462-023-00384-3#availability-of-data-and-materials). Data for this project is hosted on the [Integrated Marine Observing System Animal Tracking Facility (IMOS ATF) database](https://imos.org.au/facilities/animaltracking) under the NSW Department of Primary Industries Coastal and Estuarine Fish Tracking (CEFT) project.
 
 Some analysis for this project was carried out using the [High Performance Cluster (HPC) Katana](https://doi.org/10.26190/669x-a286) hosted by UNSW ResTech, while some was performed on my personal laptop. The scripts are integrated, as in output from one flows into the next. However, this makes for a somewhat complicated workflow whereby computationally intensive parts were submitted to Katana and less intensive aspects were done locally. With this in mind, the following briefly describes the workflow and output from each step.
 

@@ -41,24 +41,12 @@ crab.data <- raw.data %>% dplyr::select(ID = FullId, time = Time, lon = Longitud
 # determined this by going back over scanned datasheets and some plotting of the data (these two didn't move)
 crab.data <- crab.data %>% lost_tags(tags = c("A69-9006-7799", "A69-9006-7806"))
 
-# remove the first day after tagging
-#crab.data <- crab.data %>%
- # group_by(ID) %>%
-  #filter(date(time) != min(date(time))) %>%
-  #ungroup()
-
 # calculate time difference between detections
 crab.data <- crab.data %>% time_diff()
 
-# figure out interpolation interval
-# follows advice in Lawler et al. 2019
-# between median and third quartile of observed differences
-median <- median(crab.data$time.diff)
-third <- as.numeric(quantile(crab.data$time.diff, probs = 0.75))
-timeStep <- round((median+third)/2)
+# interpolation interval
 timeStep <- seq(timeStep, timeStep*3, timeStep)
 timeStep <- paste0(timeStep, " mins")
-#timeStep <- "15 mins"
 
 for (i in 1:length(timeStep)) {
   max.time <- timeStep[i] %>% str_sub(1, 2) %>% as.numeric()*4 # max.time before splitting trajectory into separate tracks
@@ -70,10 +58,6 @@ for (i in 1:length(timeStep)) {
   # we will remove any tracks with less than n detections
   # this helps with numerical stability while doing mle
   # Bacheler et al., 2019 go with n = 100
-  # lets aim to have tracks longer than 12 hours
-  n <- 12*60
-  ts <- timeStep[i] %>% str_sub(1, 2) %>% as.numeric()
-  n <- round(n/ts) # this equals at least 12 hour long tracks - for bigger timeStep this may be an issue
   n <- 100
   
   # remove any tracks with too few detections
